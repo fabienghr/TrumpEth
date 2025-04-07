@@ -28,6 +28,7 @@ export default function Home() {
   const [error, setError] = useState("")
   const bgAudioRef = useRef<HTMLAudioElement | null>(null)
   const drillAudioRef = useRef<HTMLAudioElement | null>(null)
+  const resultRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Auto-play background music on interaction
@@ -67,6 +68,26 @@ export default function Home() {
     }, 9000)
   }
 
+  const shareOnTwitter = () => {
+    // Prepare the text for the tweet
+    const tweetText = "I've been Trumped...\nCheck how much you've been Trumped on https://trump-rekt-checker.vercel.app/";
+    
+    // Create the actual tweet text with the result data
+    let resultText = "";
+    if (data) {
+      const lossAmount = parseFloat(data.diff) < 0 ? `${Math.abs(parseFloat(data.diff)).toFixed(2)}` : "";
+      resultText = parseFloat(data.diff) < 0 
+        ? `I lost $ ${lossAmount} since Trump became President! 😢\n\n`
+        : "Somehow I gained money since Trump became President! 💸\n\n";
+    }
+    
+    // Combine texts and encode for URL
+    const fullText = encodeURIComponent(resultText + tweetText);
+    
+    // Open Twitter with pre-populated text
+    window.open(`https://twitter.com/intent/tweet?text=${fullText}`, '_blank');
+  }
+
   return (
     <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-between">
       {/* Background Music */}
@@ -98,12 +119,27 @@ export default function Home() {
               <Button onClick={getWalletData} disabled={loading || !wallet} className="w-full">
                 Show me the MONEY
               </Button>
+              
+              {/* Added attribution line with image */}
+              <div className="text-center text-sm text-gray-600 mt-2">
+                <p>Made with Love by</p>
+                <a href="https://x.com/wifdev_" target="_blank" rel="noopener noreferrer" className="inline-block mt-1">
+                  <Image 
+                    src="/wifdev.jpg" 
+                    alt="@wifdev_" 
+                    width={100}
+                    height={100}
+                    className="mx-auto rounded-full w-20 h-20 object-cover"
+                  />
+                  <span className="text-blue-600 hover:underline block mt-1">@wifdev_</span>
+                </a>
+              </div>
             </div>
 
             {error && <p className="text-red-500">{error}</p>}
 
             {data && (
-              <div className="pt-4 border-t space-y-1">
+              <div className="pt-4 border-t space-y-1" ref={resultRef}>
                 <p><strong>ETH Balance:</strong> {data.balanceEth} ETH</p>
                 <p><strong>ETH Price Now:</strong> ${data.ethPriceNow}</p>
                 <p><strong>Your Bag Today:</strong> ${data.usdNow}</p>
@@ -113,6 +149,14 @@ export default function Home() {
                     ? `😢 You got Trumped: -$${Math.abs(parseFloat(data.diff))}`
                     : `💸 Somehow... you gained $${data.diff}`}
                 </p>
+                
+                {/* Added Twitter share button */}
+                <Button 
+                  onClick={shareOnTwitter} 
+                  className="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  📱 Share on Twitter how much you've been Trumped
+                </Button>
               </div>
             )}
           </CardContent>
