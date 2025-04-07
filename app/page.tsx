@@ -6,15 +6,25 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import Image from "next/image"
 
 const ETHERSCAN_API_KEY = "8TKFEYTNRI5IX492M2MZYATTZ4C3MA1K24"
 const JAN20_PRICE = 3359.00
+
+// Define interface for wallet data
+interface WalletData {
+  balanceEth: string;
+  ethPriceNow: string;
+  usdNow: string;
+  usdJan20: string;
+  diff: string;
+}
 
 export default function Home() {
   const [wallet, setWallet] = useState("")
   const [loading, setLoading] = useState(false)
   const [showLoadingScreen, setShowLoadingScreen] = useState(false)
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<WalletData | null>(null)
   const [error, setError] = useState("")
   const bgAudioRef = useRef<HTMLAudioElement | null>(null)
   const drillAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -67,8 +77,9 @@ export default function Home() {
           usdJan20: usdJan20.toFixed(2),
           diff: diff.toFixed(2),
         })
-      } catch (err) {
+      } catch (error) {
         setError("Failed to fetch data. Check wallet address.")
+        console.error("Error fetching wallet data:", error)
       }
       setLoading(false)
     }, 9000)
@@ -84,8 +95,7 @@ export default function Home() {
       {showLoadingScreen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 text-white flex flex-col items-center justify-center text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 animate-pulse">Fetching your portfolio pain… 💀</h2>
-            <p className="text-lg sm:text-xl">Trump’s policies + Ethereum = RED candles 🩸</p>
-
+            <p className="text-lg sm:text-xl">Trump policies + Ethereum = RED candles 🩸</p>
         </div>
       )}
 
@@ -93,11 +103,10 @@ export default function Home() {
       <main className="z-10 mt-16 flex-grow flex items-start justify-center px-4">
         <Card className="p-6 w-full max-w-xl shadow-2xl space-y-4">
           <CardContent className="space-y-4">
-          <h1 className="text-2xl font-bold text-center">Trump Rekt Wallet Checker</h1>
-
+            <h1 className="text-2xl font-bold text-center">Trump Rekt Wallet Checker</h1>
 
             <div className="space-y-2">
-            <Label htmlFor="wallet">Enter your ETH wallet for the Trump Show</Label>
+              <Label htmlFor="wallet">Enter your ETH wallet for the Trump Show</Label>
               <Input
                 id="wallet"
                 placeholder="0x..."
@@ -118,11 +127,10 @@ export default function Home() {
                 <p><strong>Your Bag Today:</strong> ${data.usdNow}</p>
                 <p><strong>Your Bag on Jan 20 (Pre-Trump):</strong> ${data.usdJan20}</p>
                 <p className={`font-bold ${parseFloat(data.diff) < 0 ? "text-red-500" : "text-green-600"}`}>
-  {parseFloat(data.diff) < 0
-    ? `😢 You got Trumped: -$${Math.abs(data.diff)}`
-    : `💸 Somehow... you gained $${data.diff}`}
-</p>
-
+                  {parseFloat(data.diff) < 0
+                    ? `😢 You got Trumped: -$${Math.abs(parseFloat(data.diff))}`
+                    : `💸 Somehow... you gained $${data.diff}`}
+                </p>
               </div>
             )}
           </CardContent>
@@ -131,8 +139,20 @@ export default function Home() {
 
       {/* Trump GIFs at the bottom */}
       <div className="z-0 w-full flex justify-center gap-4 py-6 bg-white">
-        <img src="/trump-dance.gif" alt="Trump Dance" className="w-48 sm:w-56 md:w-64 h-auto" />
-        <img src="/trump-dance.gif" alt="Trump Dance" className="w-48 sm:w-56 md:w-64 h-auto" />
+        <Image 
+          src="/trump-dance.gif" 
+          alt="Trump Dance" 
+          width={256}
+          height={256}
+          className="w-48 sm:w-56 md:w-64 h-auto" 
+        />
+        <Image 
+          src="/trump-dance.gif" 
+          alt="Trump Dance" 
+          width={256}
+          height={256}
+          className="w-48 sm:w-56 md:w-64 h-auto" 
+        />
       </div>
     </div>
   )
