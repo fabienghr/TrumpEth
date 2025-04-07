@@ -155,7 +155,7 @@ export default function Home() {
                   onClick={shareOnTwitter} 
                   className="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  📱 Share on Twitter how much you've been Trumped
+                  📱 Share on Twitter how much you ve been Trumped
                 </Button>
               </div>
             )}
