@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
 
-const ETHERSCAN_API_KEY = "8TKFEYTNRI5IX492M2MZYATTZ4C3MA1K24"
-const JAN20_PRICE = 3359.00
+// Price moved to server-side API route
+// No constants needed here
 
 // Define interface for wallet data
 interface WalletData {
@@ -56,27 +56,9 @@ export default function Home() {
 
       setLoading(true)
       try {
-        const balanceRes = await axios.get(
-          `https://api.etherscan.io/api?module=account&action=balance&address=${wallet}&tag=latest&apikey=${ETHERSCAN_API_KEY}`
-        )
-        const balanceEth = parseInt(balanceRes.data.result) / 1e18
-
-        const priceRes = await axios.get(
-          `https://api.etherscan.io/api?module=stats&action=ethprice&apikey=${ETHERSCAN_API_KEY}`
-        )
-        const ethPriceNow = parseFloat(priceRes.data.result.ethusd)
-
-        const usdNow = balanceEth * ethPriceNow
-        const usdJan20 = balanceEth * JAN20_PRICE
-        const diff = usdNow - usdJan20
-
-        setData({
-          balanceEth: balanceEth.toFixed(5),
-          ethPriceNow: ethPriceNow.toFixed(2),
-          usdNow: usdNow.toFixed(2),
-          usdJan20: usdJan20.toFixed(2),
-          diff: diff.toFixed(2),
-        })
+        // Use our server-side API route instead of direct Etherscan API calls
+        const response = await axios.get(`/api/wallet-data?address=${wallet}`)
+        setData(response.data)
       } catch (error) {
         setError("Failed to fetch data. Check wallet address.")
         console.error("Error fetching wallet data:", error)
@@ -95,7 +77,7 @@ export default function Home() {
       {showLoadingScreen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 text-white flex flex-col items-center justify-center text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 animate-pulse">Fetching your portfolio pain… 💀</h2>
-            <p className="text-lg sm:text-xl">Trump policies + Ethereum = RED candles 🩸</p>
+            <p className="text-lg sm:text-xl">Trump&apos;s policies + Ethereum = RED candles 🩸</p>
         </div>
       )}
 
